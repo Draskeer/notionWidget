@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Motorbike Gallery Widget</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+    }
+    .gallery-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 90%;
+      max-width: 400px;
+      padding: 10px;
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow-y: auto;
+      height: 80vh;
+    }
+    .bike-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      text-align: center;
+    }
+    .bike-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 5px;
+    }
+    .bike-info {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="gallery-container" id="galleryContainer">Loading images...</div>
+
+  <script>
+    async function fetchMotorbikeImages() {
+      try {
+        const response = await fetch('http://88.160.225.9:22222/api/motos/');
+        if (!response.ok) throw new Error("Failed to fetch data");
+
+        const data = await response.json();
+        const galleryContainer = document.getElementById('galleryContainer');
+        galleryContainer.innerHTML = ''; // Clear initial loading text
+
+        // Display each bike's image and details
+        data.forEach(bike => {
+          const bikeCard = document.createElement('div');
+          bikeCard.className = 'bike-card';
+
+          // Create image element
+          const bikeImage = document.createElement('img');
+          bikeImage.src = `http://88.160.225.9:22222/${bike.imageUrl}`;
+          bikeImage.alt = `${bike.marque} ${bike.model}`;
+
+          // Create info div
+          const bikeInfo = document.createElement('div');
+          bikeInfo.className = 'bike-info';
+          bikeInfo.innerHTML = `
+            <strong>${bike.marque} ${bike.model}</strong><br>
+            Photographer: ${bike.photographe}<br>
+            Location: ${bike.lieu}
+          `;
+
+          // Append image and info to card, then card to gallery
+          bikeCard.appendChild(bikeImage);
+          bikeCard.appendChild(bikeInfo);
+          galleryContainer.appendChild(bikeCard);
+        });
+      } catch (error) {
+        console.error("Error:", error);
+        galleryContainer.innerHTML = 'Failed to load images.';
+      }
+    }
+
+    // Fetch images when the page loads
+    window.onload = fetchMotorbikeImages;
+  </script>
+</body>
+</html>
