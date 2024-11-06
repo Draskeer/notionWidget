@@ -56,13 +56,23 @@
 
   <script>
     async function fetchMotorbikeImages() {
+      const galleryContainer = document.getElementById('galleryContainer');
+      
       try {
         const response = await fetch('http://88.160.225.9:22222/api/motos/');
         if (!response.ok) throw new Error("Failed to fetch data");
 
         const data = await response.json();
-        const galleryContainer = document.getElementById('galleryContainer');
-        galleryContainer.innerHTML = ''; // Clear initial loading text
+        console.log("Data received:", data); // Log the data for debugging
+
+        // Clear initial loading text
+        galleryContainer.innerHTML = ''; 
+
+        // Check if data is empty
+        if (data.length === 0) {
+          galleryContainer.innerHTML = 'No images available.';
+          return;
+        }
 
         // Display each bike's image and details
         data.forEach(bike => {
@@ -73,6 +83,12 @@
           const bikeImage = document.createElement('img');
           bikeImage.src = `http://88.160.225.9:22222/${bike.imageUrl}`;
           bikeImage.alt = `${bike.marque} ${bike.model}`;
+          
+          // Handle image loading errors
+          bikeImage.onerror = () => {
+            bikeImage.src = 'path/to/default-image.jpg'; // Replace with your default image path
+            console.warn(`Failed to load image for ${bike.marque} ${bike.model}`);
+          };
 
           // Create info div
           const bikeInfo = document.createElement('div');
@@ -90,7 +106,7 @@
         });
       } catch (error) {
         console.error("Error:", error);
-        galleryContainer.innerHTML = 'Failed to load images.';
+        galleryContainer.innerHTML = 'Failed to load images. Please try again later.';
       }
     }
 
